@@ -138,7 +138,7 @@ const App = () => {
             </Box>
           ) : (
             // Show the lists if not error='Something went wrong' else do not show the lists
-            error ? (
+            error && error === "Something went wrong while fetching lists" ? (
               <>
                 
               </>
