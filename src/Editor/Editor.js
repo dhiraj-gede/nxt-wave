@@ -68,9 +68,9 @@ const EditMode = ({ levels, updateLevels, abortEdit }) => {
         )}
       </Grid>
 
-      <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-        <Button onClick={() => updateLevels(lists)}>update</Button>
-        <Button onClick={abortEdit}>cancel</Button>
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%", gap:1 }}>
+        <Button onClick={abortEdit} variant="outlined" >cancel</Button>
+        <Button onClick={() => updateLevels(lists)} variant="contained">update</Button>
       </Box>
     </React.Fragment>
   );
