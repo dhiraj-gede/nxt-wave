@@ -1,5 +1,5 @@
 import React from "react";
-import { List as MuiList, ListSubheader, Checkbox } from "@mui/material";
+import { List as MuiList, ListSubheader, Checkbox, FormControlLabel } from "@mui/material";
 import ListItem from "./ListItem";
 
 /**
@@ -74,12 +74,15 @@ const renderSubheader = (title, itemCount, editMode, onCheckboxChange) => {
       {editMode ? (
         <></>
       ) : (
-        <Checkbox
-          bgcolor={"white"}
-          onChange={(event) => onCheckboxChange(event.target.checked)}
+        <FormControlLabel
+          control={<Checkbox bgcolor={"white"}
+          onChange={(event) => onCheckboxChange(event.target.checked)}/>}
+          label={title}
+          labelPlacement="end"
         />
+        
       )}
-      {title} {editMode ? `(${itemCount})` : ""}
+       {editMode ? `(${itemCount})` : ""}
     </ListSubheader>
   );
 };
