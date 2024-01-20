@@ -26,10 +26,11 @@ const List = ({
           color: "black",
         }}
       >
-        <Checkbox
+        {editMode? <></> : <Checkbox
           bgcolor={"white"}
           onChange={(event) => onCheckboxChange(event.target.checked)}
-        />
+        />}
+        
         {title} {editMode? `(${items.length})` : ''}
       </ListSubheader>
     }
