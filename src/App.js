@@ -24,8 +24,8 @@ const App = () => {
   const [editMode, setEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch the data from the API and transform it into the desired format
-  useEffect(()=>{
+  //function to fetch data
+  const fetchData = () => {
     fetch('https://apis.ccbp.in/list-creation/lists').then(
       res=>{
         return res.json();
@@ -47,15 +47,18 @@ const App = () => {
           tempList[listNumber - 1].push(newObj);
         }
         setLists(tempList)
-        // Set isLoading to false after data is set
         setIsLoading(false)
       }
     ).catch(
       error=>{
-        // Set isLoading to false after error occurs
+        setError("Something went wrong while fetching lists")
         setIsLoading(false)
       }
     )
+  }
+  // Fetch the data from the API and transform it into the desired format
+  useEffect(()=>{
+    fetchData();
   },[])
 
   // Handle the checkbox change event for selecting lists
@@ -134,13 +137,18 @@ const App = () => {
               </Box>
             </Box>
           ) : (
-            // Show the lists
+            // Show the lists if not error='Something went wrong' else do not show the lists
+            error ? (
+              <>
+                
+              </>
+            ) : (  
             lists.map((list, index) => (
               <Grid item xl={3} lg={3} sm={6} md={4}  key={index} >
   
               <List editMode={false} title={`List ${index + 1}`} items={list}  onCheckboxChange={(event) => handleCheckboxChange(index, event)} />
             </Grid>
-            ))
+            )))
           )
         )}
       </Grid>
