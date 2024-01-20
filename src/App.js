@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Container, Typography, Box, Alert } from '@mui/material';
-import List from './List/List';
-import "./App.css"
-import EditMode from './Editor/Editor';
+import React, { useEffect, useState } from "react";
+import { Container } from "@mui/material";
+import "./App.css";
+import EditMode from "./Editor/Editor";
 import Grid from "@mui/material/Grid";
-import CircularProgress from '@mui/material/CircularProgress';
+import renderLoading from "./Helpers/Loading.helper";
+import renderLists from "./Helpers/List.helper";
+import renderListCreation from "./Helpers/CreateNewList.helper";
 
 /**
  * Component for creating and editing lists of items.
- * @component App
- * @returns {JSX.Element}
- * @example 
- * return (
- *   <App />
- * )
+ * @component
+ * @returns {JSX.Element} The App component.
  */
 const App = () => {
-
-  // State variables for lists, selected lists, error message, and edit mode
+  // The state for the lists of items.
   const [lists, setLists] = useState([]);
+  // The state for the selected lists to edit.
   const [selectedLists, setSelectedLists] = useState([]);
-  const [error, setError] = useState('');
+  // The state for the error message.
+  const [error, setError] = useState("");
+  // The state for the edit mode flag.
   const [editMode, setEditMode] = useState(false);
+  // The state for the loading indicator.
   const [isLoading, setIsLoading] = useState(true);
 
-  //function to fetch data
+  // The function to fetch the data from the API.
   const fetchData = () => {
     fetch('https://apis.ccbp.in/list-creation/lists').then(
       res=>{
@@ -56,104 +56,90 @@ const App = () => {
       }
     )
   }
-  // Fetch the data from the API and transform it into the desired format
-  useEffect(()=>{
-    fetchData();
-  },[])
 
-  // Handle the checkbox change event for selecting lists
+  // Fetch the data when the component mounts.
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // The function to handle the checkbox change event.
   const handleCheckboxChange = (index, event) => {
-      if(event){
-        setSelectedLists(()=>{
-          return [...selectedLists, index]
-        });
-      }
-      else{
-        setSelectedLists(selectedLists.filter(item=>item !== index))
-      }
+    if (event) {
+      setSelectedLists(() => {
+        return [...selectedLists, index];
+      });
+    } else {
+      setSelectedLists(selectedLists.filter((item) => item !== index));
+    }
   };
 
-  // Handle the button click event for creating a new list
+  // The function to handle the create new list button click event.
   const handleCreateNewList = () => {
-    if(!lists.length){
-      setError("Wait for lists to be rendered")
-    }
-    else if (selectedLists.length < 2) {
-      setError('You should select at exactly two lists to create a new list.');
-    }else if(selectedLists.length === 2){
-      setError(null)
+    if (!lists.length) {
+      setError("Wait for lists to be rendered");
+    } else if (selectedLists.length < 2) {
+      setError("You should select exactly two lists to create a new list.");
+    } else if (selectedLists.length === 2) {
+      setError(null);
       const newLists = [...lists, []];
       setLists(newLists);
       setSelectedLists([...selectedLists]);
       setEditMode(true);
+    } else if (selectedLists.length > 2) {
+      setError("Exactly two lists can be selected at a time.");
     }
-    else if(selectedLists.length > 2)
-    {
-      setError('exactly two lists can be selected at a time.');
-    } 
   };
 
-  // Handle the level change event for updating the lists
-  const handleLevelChange = (list) =>{
-    const newArr = [...lists]
-    list.forEach(item => newArr[item.listNumber] = item.list)
-    setLists(newArr)
+  // The function to handle the level change event.
+  const handleLevelChange = (list) => {
+    const newArr = [...lists];
+    list.forEach((item) => (newArr[item.listNumber] = item.list));
+    setLists(newArr);
     setSelectedLists([]);
-    setEditMode(false)
-  }
-
-  // Handle the abort edit event for disabling the edit mode
-  const DisableEditMode = () => {
-    setSelectedLists([]);
-    setLists(lists.filter(item=>item.length))
     setEditMode(false);
-  }
-  
+  };
+
+  // The function to disable the edit mode.
+  const disableEditMode = () => {
+    setSelectedLists([]);
+    setLists(lists.filter((item) => item.length));
+    setEditMode(false);
+  };
 
   return (
-    <Container className='container' maxWidth={false}>
-    {
-      editMode ?
-      <></> :
-      <Box display="flex" flexDirection="column" alignItems="center" pt={'2rem'}  mb={10}>
-        <Typography variant="h4" mb={'1rem'} fontWeight={'600'}>List Creation</Typography>
-        <Button variant="contained" color="primary" onClick={handleCreateNewList}>Create a new list</Button>
-        {error && <Alert sx={{mt:1}} severity="error">{error}</Alert>}
-      </Box>
-    }
-      <Grid sx={{ flexGrow: 1 }} container spacing={1} bgcolor="white" width={'100%'} height={'100%'} >
-        {editMode ? (
-          <EditMode abortEdit={DisableEditMode} levels={{l: selectedLists.map(index => {return ({list: lists[index], listNumber: index})}), total: lists.length}} updateLevels={(listx)=>handleLevelChange(listx)}/>
-        ) : (
-          // Use a ternary operator to show the loader or the lists
-          isLoading ? (
-            // Show the loader component
-            <Box sx={{display:'flex', justifyContent:'center', flexDirection:'column', alignItems:'center', width:'100%'}}>
-              <Box mb={1}>
-                <CircularProgress />
-              </Box>
-              <Box sx={{mt:5}}>
-                <Typography variant="p" mb={'1rem'} fontWeight={'600'}>Loading Lists</Typography>
-              </Box>
-            </Box>
-          ) : (
-            // Show the lists if not error='Something went wrong' else do not show the lists
-            error && error === "Something went wrong while fetching lists" ? (
-              <>
-                
-              </>
-            ) : (  
-            lists.map((list, index) => (
-              <Grid item xl={3} lg={3} sm={6} md={4}  key={index} >
-  
-              <List editMode={false} title={`List ${index + 1}`} items={list}  onCheckboxChange={(event) => handleCheckboxChange(index, event)} />
-            </Grid>
-            )))
-          )
-        )}
-      </Grid>
+    <Container className="container" maxWidth={false}>
+      {editMode ? (
+        <EditMode
+          abortEdit={disableEditMode}
+          levels={{
+            l: selectedLists.map((index) => {
+              return { list: lists[index], listNumber: index };
+            }),
+            total: lists.length,
+          }}
+          updateLevels={(listx) => handleLevelChange(listx)}
+        />
+      ) : (
+        <>
+          {renderListCreation(error,handleCreateNewList)}
+          <Grid
+            sx={{ flexGrow: 1 }}
+            container
+            spacing={1}
+            bgcolor="white"
+            width={"100%"}
+            height={"100%"}
+          >
+            {isLoading ? renderLoading() : renderLists(lists, handleCheckboxChange)}
+          </Grid>
+        </>
+      )}
     </Container>
   );
 };
 
 export default App;
+
+/**
+ * @module App
+ */

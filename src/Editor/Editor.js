@@ -14,11 +14,7 @@ import Grid from "@mui/material/Grid";
  */
 const EditMode = ({ levels, updateLevels, abortEdit }) => {
   // The state for the edited lists.
-  const [lists, setLists] = React.useState([
-    JSON.parse(JSON.stringify(levels.l[0])),        //deep copy
-    { list: [], listNumber: levels.total - 1 },
-    JSON.parse(JSON.stringify(levels.l[1])),        //deep copy
-  ]);
+  const [lists, setLists] = React.useState(getInitialLists(levels));
 
   /**
    * Handles the movement of an item from one list to another.
@@ -30,14 +26,9 @@ const EditMode = ({ levels, updateLevels, abortEdit }) => {
     const newLists = [...lists];
     const list = newLists[index];
     const item = list.list[itemIndex];
-    if (direction === "right") {
-      list.list.splice(itemIndex, 1);
-      newLists[index+1].list.splice(newLists[index+1].list.length, 0, item);
-    }
-    if (direction === "left") {
-      list.list.splice(itemIndex, 1);
-      newLists[index-1].list.splice(newLists[index-1].list.length, 0, item);
-    }
+    list.list.splice(itemIndex, 1); // Remove the item from the source list
+    const targetIndex = direction === "right" ? index + 1 : index - 1; // Get the index of the target list
+    newLists[targetIndex].list.push(item); // Add the item to the target list
     setLists(newLists);
   };
 
@@ -49,28 +40,28 @@ const EditMode = ({ levels, updateLevels, abortEdit }) => {
         spacing={1}
         bgcolor="white"
       >
-        {lists && lists.length ? (
-          lists.map((list, index) => (
-            <Grid key={index} item xl={2} lg={3} sm={4} md={4}>
-              <List
-                editMode={true}
-                title={`List ${list.listNumber + 1}`}
-                items={list.list}
-                laneNumber = {index}
-                onMoveItem={(itemIndex, direction) =>
-                  handleLaneMovement(index, itemIndex, direction)
-                }
-              />
-            </Grid>
-          ))
-        ) : (
-          <>{lists[0]}</>
-        )}
+        {lists.map((list, index) => (
+          <Grid key={index} item xl={2} lg={3} sm={4} md={4}>
+            <List
+              editMode={true}
+              title={`List ${list.listNumber + 1}`}
+              items={list.list}
+              laneNumber={index}
+              onMoveItem={(itemIndex, direction) =>
+                handleLaneMovement(index, itemIndex, direction)
+              }
+            />
+          </Grid>
+        ))}
       </Grid>
 
-      <Box sx={{ display: "flex", justifyContent: "center", width: "100%", gap:1 }}>
-        <Button onClick={abortEdit} variant="outlined" >cancel</Button>
-        <Button onClick={() => updateLevels(lists)} variant="contained">update</Button>
+      <Box sx={{ display: "flex", justifyContent: "center", width: "100%", gap: 1 }}>
+        <Button onClick={abortEdit} variant="outlined">
+          cancel
+        </Button>
+        <Button onClick={() => updateLevels(lists)} variant="contained">
+          update
+        </Button>
       </Box>
     </React.Fragment>
   );
@@ -81,3 +72,16 @@ export default EditMode;
 /**
  * @module EditMode
  */
+
+/**
+ * Gets the initial state for the edited lists.
+ * @param {Object} levels - The lists to edit.
+ * @returns {Array} The initial state for the edited lists.
+ */
+const getInitialLists = (levels) => {
+  return [
+    JSON.parse(JSON.stringify(levels.l[0])), // Deep copy
+    { list: [], listNumber: levels.total - 1 },
+    JSON.parse(JSON.stringify(levels.l[1])), // Deep copy
+  ];
+};
