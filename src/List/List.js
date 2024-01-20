@@ -72,7 +72,7 @@ const renderSubheader = (title, itemCount, editMode, onCheckboxChange) => {
       }}
     >
       {editMode ? (
-        <></>
+        <>{title} ({itemCount})</>
       ) : (
         <FormControlLabel
           control={<Checkbox bgcolor={"white"}
@@ -82,7 +82,7 @@ const renderSubheader = (title, itemCount, editMode, onCheckboxChange) => {
         />
         
       )}
-       {editMode ? `(${itemCount})` : ""}
+       
     </ListSubheader>
   );
 };
